@@ -1,34 +1,60 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Title, Form, Input, Repositories } from './style';
 
+import api from '../../services/api';
+
 import logo from '../../assets/logo.svg';
 
+interface Repository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepository(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+
+    const response = await api.get<Repository>(`/repos/${newRepo}`);
+
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
+  }
+
   return (
     <>
       <img src={logo} alt="Logo Projeto" />
       <Title>Dashboard</Title>
-      <Form>
-        <Input placeholder="Digite o nome do repositório" />
+      <Form onSubmit={handleAddRepository}>
+        <Input
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.target.value)}
+          placeholder="Digite o nome do repositório"
+        />
         <button type="submit">Pesquisar</button>
       </Form>
 
       <Repositories>
-        <a href="Teste">
-          <img
-            src="https://avatars2.githubusercontent.com/u/18121502?s=460&u=65f935dadb23365cb1078fff4f8ff0886df7535e&v=4"
-            alt="Dhruv"
-          />
-          <div>
-            <strong>nodejs/i18n</strong>
-            <p>
-              The Node.js Internationalization Working Group – A Community
-              Committee initiative.
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
+        {repositories.map((repository) => (
+          <a key={repository.full_name} href="Teste">
+            <img src={repository.owner.avatar_url} alt="Dhruv" />
+            <div>
+              <strong>{repository.full_name}</strong>
+              <p>{repository.description}</p>
+            </div>
+            <FiChevronRight size={20} />
+          </a>
+        ))}
       </Repositories>
     </>
   );
