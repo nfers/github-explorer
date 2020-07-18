@@ -24,6 +24,7 @@ module.exports = {
   },
   "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
   "rules": {
+    "react/jsx-one-expression-per-line": "off",
     "prettier/prettier": ["error", {}, {
       "fileInfoOptions": {
         "withNodeModules": true
